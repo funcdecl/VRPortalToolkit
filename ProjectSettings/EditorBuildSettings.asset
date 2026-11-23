@@ -5,18 +5,21 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Samples/XR Interaction Toolkit/2.3.2/Starter Assets/DemoScene2.unity
-    guid: 423abb06d4a9976408a2d288ea8d5c4e
+  - enabled: 1
+    path: Assets/VRPortalToolkit/DesktopDemo/DesktopDemo.unity
+    guid: 8ee384cf475133ca4af8a7b5f88db011
+  - enabled: 1
+    path: Assets/VRPortalToolkit/Examples/Scenes/ExtendedReach.unity
+    guid: 7e70a52fe31cb174c838d9ab963793d0
   - enabled: 1
     path: Assets/VRPortalToolkit/Examples/Scenes/PointAndPortal.unity
     guid: e8b5403f810209340825203bbbc1c7f6
+  - enabled: 1
+    path: Assets/VRPortalToolkit/Examples/Scenes/PortalOverlays.unity
+    guid: 145d7cffa9f130d458ae0f385b9a2a41
+  - enabled: 1
+    path: Assets/VRPortalToolkit/Examples/Scenes/Raycaster.unity
+    guid: 2888515e3a31dfa4a9103e52be84e200
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 0055f3b559c412246859f6589c8ac5a8, type: 2}
     Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: 87f3d906a5a44b946a1380d6044fb4cb, type: 2}

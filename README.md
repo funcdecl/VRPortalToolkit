@@ -41,3 +41,8 @@ This toolkit was developed in conjunction with the following research papers:
 * [Adaptive Portals: Enhancing Virtual Reality Interaction Spaces With Real-Time Self-Adjusting Portals](https://ieeexplore.ieee.org/abstract/document/10765380)
 * [Simultaneous Presence Continuum: Portal Overlays for Overlapping Worlds in Virtual Reality](https://ieeexplore.ieee.org/abstract/document/10949819)
 
+## Linux Desktop Demo
+
+A keyboard-and-mouse example uses the toolkit's BasicPortalPair, URP portal rendering and Portable physics components. See [Desktop Demo](README_DEMO.md) for Linux build commands, controls and runtime verification.
+
+![Desktop portal demo](docs/demo/portal-before.png)

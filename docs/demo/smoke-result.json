@@ -1,0 +1,14 @@
+{
+    "passed": true,
+    "scene": "DesktopDemo",
+    "graphicsDevice": "NVIDIA GeForce RTX 4090",
+    "graphicsApi": "Vulkan",
+    "linkedPortalPair": true,
+    "portalShowsDestination": true,
+    "playerTeleportCount": 1,
+    "physicsBallTeleportCount": 1,
+    "playerReachedExit": true,
+    "physicsBallReachedExit": true,
+    "frameCount": 283,
+    "errors": []
+}
