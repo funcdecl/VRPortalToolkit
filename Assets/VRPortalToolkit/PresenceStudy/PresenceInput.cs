@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
+using Key = UnityEngine.InputSystem.Key;
+using Keyboard = UnityEngine.InputSystem.Keyboard;
+using Mouse = UnityEngine.InputSystem.Mouse;
 
 namespace VRPortalToolkit.Presence
 {
@@ -46,30 +49,32 @@ namespace VRPortalToolkit.Presence
         {
             if (allowLook)
             {
-                float directionX = Axis(KeyCode.LeftArrow, KeyCode.RightArrow);
-                float directionY = Axis(KeyCode.UpArrow, KeyCode.DownArrow);
+                float directionX = Axis(Key.LeftArrow, Key.RightArrow);
+                float directionY = Axis(Key.UpArrow, Key.DownArrow);
                 yaw += 95f * Time.unscaledDeltaTime * directionX;
                 pitch += 78f * Time.unscaledDeltaTime * directionY;
-                if (Input.GetMouseButton(1))
+                Mouse mouse = Mouse.current;
+                if (mouse != null && mouse.rightButton.isPressed)
                 {
-                    yaw += 2.25f * Input.GetAxisRaw("Mouse X");
-                    pitch -= 2.25f * Input.GetAxisRaw("Mouse Y");
+                    Vector2 drag = mouse.delta.ReadValue();
+                    yaw += 0.15f * drag.x;
+                    pitch -= 0.15f * drag.y;
                 }
                 pitch = Mathf.Clamp(pitch, -65f, 75f);
                 eye.rotation = Quaternion.Euler(pitch, yaw, 0f);
-                if (Input.GetKeyDown(KeyCode.Home))
+                if (Pressed(Key.Home))
                     Recenter(eye);
             }
 
-            if (Input.GetKeyDown(KeyCode.F))
+            if (Pressed(Key.F))
                 desktopHeld = !desktopHeld;
             Held = desktopHeld;
-            Aim = Held && Input.GetKey(KeyCode.Space);
+            Aim = Held && HeldKey(Key.Space);
             ReleasedAim = previousAim && !Aim && Held;
             previousAim = Aim;
-            Select = Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.G);
-            Advance = Input.GetKeyDown(KeyCode.Return);
-            Turn = Axis(KeyCode.Q, KeyCode.E) * Time.unscaledDeltaTime * 100f;
+            Select = Mouse.current?.leftButton.wasPressedThisFrame == true || Pressed(Key.G);
+            Advance = Pressed(Key.Enter);
+            Turn = Axis(Key.Q, Key.E) * Time.unscaledDeltaTime * 100f;
             Ray = new Ray(eye.position, eye.forward);
             PortalPosition = new Vector3(0f, 1.41f, 0.57f);
             PortalRotation = Quaternion.Euler(0, 180f, 0);
@@ -129,9 +134,13 @@ namespace VRPortalToolkit.Presence
             previousMenu = menu;
         }
 
-        private static float Axis(KeyCode negative, KeyCode positive)
+        public static bool Pressed(Key key) => Keyboard.current?[key].wasPressedThisFrame == true;
+
+        private static bool HeldKey(Key key) => Keyboard.current?[key].isPressed == true;
+
+        private static float Axis(Key negative, Key positive)
         {
-            return (Input.GetKey(positive) ? 1f : 0f) - (Input.GetKey(negative) ? 1f : 0f);
+            return (HeldKey(positive) ? 1f : 0f) - (HeldKey(negative) ? 1f : 0f);
         }
     }
 }

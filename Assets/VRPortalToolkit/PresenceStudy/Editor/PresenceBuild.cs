@@ -120,7 +120,6 @@ namespace VRPortalToolkit.Presence
 
         public static void Linux()
         {
-            CreateStudy();
             string output = Environment.GetEnvironmentVariable("VRPORTAL_PRESENCE_BUILD");
             if (string.IsNullOrEmpty(output)) output = Path.GetFullPath("Builds/PresenceLinux");
             Directory.CreateDirectory(output);

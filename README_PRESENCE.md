@@ -61,7 +61,9 @@ python3 scripts/summarize-presence.py /path/to/studies/P01-* --out Artifacts/Pre
 
 ![模式比较与迷宫分拣](docs/presence/overlay-comparison.png)
 
-[试次验收](docs/presence/smoke-result.json) · [像素测量](docs/presence/render-measurements.json)
+解压后的运行包也通过了键鼠操作验收。鼠标可以打开比较界面，数字键切换条件，Space 控制门户叠加。Enter 可以进入练习并开始试次。
+
+[试次验收](docs/presence/smoke-result.json) · [像素测量](docs/presence/render-measurements.json) · [键鼠操作](docs/presence/interactive-comparison.png)
 
 ## Linux 构建与运行
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Key = UnityEngine.InputSystem.Key;
 using VRPortalToolkit.Rendering;
 using Random = System.Random;
 
@@ -240,7 +241,7 @@ namespace VRPortalToolkit.Presence
             if (automated) return;
 
             input.Read(view.transform, stage != Stage.Menu, leftHanded);
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (PresenceInput.Pressed(Key.Escape))
             {
                 if (stage == Stage.Menu)
                     Application.Quit();
@@ -310,18 +311,18 @@ namespace VRPortalToolkit.Presence
         {
             for (int i = 0; i < 5; ++i)
             {
-                if (Input.GetKeyDown((KeyCode)((int)KeyCode.Alpha1 + i)))
+                if (PresenceInput.Pressed((Key)((int)Key.Digit1 + i)))
                     SetPracticeTechnique((OverlayTechnique)i);
             }
 
-            if (Input.GetKeyDown(KeyCode.M))
+            if (PresenceInput.Pressed(Key.M))
             {
                 practiceScenario = practiceScenario == PresenceScenario.Maze ? PresenceScenario.Obstacles : PresenceScenario.Maze;
                 if (stage == Stage.Compare) StartComparison();
                 else StartSession(false);
             }
 
-            if (Input.GetKeyDown(KeyCode.R) && stage != Stage.Menu)
+            if (PresenceInput.Pressed(Key.R) && stage != Stage.Menu)
             {
                 if (stage == Stage.Compare) StartComparison();
                 else StartSession(false);
