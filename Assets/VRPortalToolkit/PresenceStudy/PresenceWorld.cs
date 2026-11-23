@@ -26,7 +26,8 @@ namespace VRPortalToolkit.Presence
             new Color32(165, 126, 245, 255), new Color32(235, 123, 197, 255)
         };
 
-        private readonly Material floor, primary, trim, marker;
+        private readonly Material floor, primary, trim, marker, label;
+        private readonly Font font;
         private readonly Material[] walls = new Material[4];
         private readonly Material[] props = new Material[4];
         private readonly Material[] colors = new Material[8];
@@ -39,8 +40,13 @@ namespace VRPortalToolkit.Presence
         public Camera Eye { get; set; }
         public Portal Entrance { get; set; }
 
-        public PresenceWorld(Material surface)
+        public PresenceWorld(Material surface, Material labelMaterial)
         {
+            label = new Material(labelMaterial);
+            materials.Add(label);
+            font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            font.RequestCharactersInTexture("0123456789FINISH", 92);
+            label.mainTexture = font.material.mainTexture;
             primary = Make(surface, new Color32(119, 67, 91, 255), "Berry wall");
             floor = Make(surface, new Color32(130, 146, 162, 255), "Floor");
             trim = Make(surface, new Color32(37, 50, 69, 255), "Trim");
@@ -250,7 +256,7 @@ namespace VRPortalToolkit.Presence
             target.layer = TargetLayer;
             target.AddComponent<BoxCollider>().size = new Vector3(0.34f, 0.31f, 0.34f);
             target.AddComponent<PresenceBin>().Number = number;
-            Label(stand, number.ToString(), position + Vector3.up * 0.23f, 0.033f);
+            Label(stand, number.ToString(), position + Vector3.up * 0.19f, 0.020f);
         }
 
         public PresenceOrb Orb(int number, Vector3 position, bool primaryWorld)
@@ -263,7 +269,7 @@ namespace VRPortalToolkit.Presence
             item.Home = position;
             item.HomeParent = orb.transform.parent;
             item.HomeLayer = orb.layer;
-            Label(orb.transform, number.ToString(), position, 0.013f, 0.041f);
+            Label(orb.transform, number.ToString(), position, 0.006f, 0.035f);
             return item;
         }
 
@@ -276,12 +282,14 @@ namespace VRPortalToolkit.Presence
             // Undo sphere scaling so the character size remains in metres.
             if (parent.GetComponent<PresenceOrb>()) label.localScale = Vector3.one / parent.lossyScale.x;
             TextMesh mesh = label.gameObject.AddComponent<TextMesh>();
+            mesh.font = font;
             mesh.text = text;
             mesh.color = Color.white;
             mesh.characterSize = size;
             mesh.fontSize = 92;
             mesh.anchor = TextAnchor.MiddleCenter;
             mesh.alignment = TextAlignment.Center;
+            label.GetComponent<MeshRenderer>().sharedMaterial = this.label;
             var facing = label.gameObject.AddComponent<PresenceLabel>();
             facing.Offset = offset;
             facing.Eye = Eye;

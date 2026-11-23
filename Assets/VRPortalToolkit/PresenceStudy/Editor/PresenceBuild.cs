@@ -52,6 +52,7 @@ namespace VRPortalToolkit.Presence
             var pair = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             pair.SetActive(true);
             Transform a = pair.transform.Find("PortalA"), b = pair.transform.Find("PortalB");
+            a.localScale = b.localScale = Vector3.one;
             a.position = new Vector3(0f, 1.41f, 0.57f);
             a.rotation = Quaternion.Euler(0f, 180f, 0f);
             b.position = new Vector3(100f, 1.41f, 0.57f);
@@ -66,6 +67,7 @@ namespace VRPortalToolkit.Presence
             study.entrance = a.GetComponentInChildren<PortalMeshRenderer>();
             study.exit = b.GetComponentInChildren<Portal>();
             study.surface = AssetMaterial("StudySurface", Shader.Find("Universal Render Pipeline/Lit"));
+            study.labelMaterial = AssetMaterial("StudyLabels", Shader.Find("VRPortalToolkit/Presence/Label"));
             study.pointerMaterial = AssetMaterial("StudyMarking", Shader.Find("Universal Render Pipeline/Unlit"));
             study.composite = AssetMaterial("StudyOverlay", Shader.Find("VRPortalToolkit/Presence/Overlay"));
 

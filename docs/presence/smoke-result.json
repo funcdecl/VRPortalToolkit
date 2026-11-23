@@ -1,0 +1,21 @@
+{
+    "passed": true,
+    "graphicsDevice": "NVIDIA GeForce RTX 4090",
+    "graphicsApi": "Vulkan",
+    "screenshotCount": 8,
+    "apertureWidthMetres": 0.30000001192092898,
+    "apertureHeightMetres": 0.30000001192092898,
+    "trainingTrials": 8,
+    "recordedTrials": 24,
+    "questionnaireStops": 4,
+    "successfulOrbTransfers": 128,
+    "successfulReactions": 64,
+    "placementLockChecks": 64,
+    "movementTrigger": true,
+    "inactivityRetraction": true,
+    "releaseRetraction": true,
+    "wallClipping": true,
+    "nearPlaneFallback": true,
+    "pointerLanding": true,
+    "failures": []
+}

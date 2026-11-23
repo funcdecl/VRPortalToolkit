@@ -1,0 +1,24 @@
+{
+  "size": [
+    1280,
+    800
+  ],
+  "samples": 106920,
+  "changed_outside_aperture": {
+    "nooverlay": 0.0,
+    "contours": 0.02599,
+    "blended": 0.86474,
+    "absolute": 0.9275,
+    "stencil": 0.30912
+  },
+  "magenta_pixels": {
+    "nooverlay": 0,
+    "contours": 0,
+    "blended": 0,
+    "absolute": 0,
+    "stencil": 0
+  },
+  "blend_linear_alpha_median": 0.33517,
+  "stencil_secondary_share": 0.33324,
+  "stencil_matched_reference_samples": 83132
+}

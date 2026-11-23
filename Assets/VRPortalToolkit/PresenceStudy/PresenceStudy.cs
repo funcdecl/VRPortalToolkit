@@ -18,6 +18,7 @@ namespace VRPortalToolkit.Presence
         public Material surface;
         public Material composite;
         public Material pointerMaterial;
+        public Material labelMaterial;
 
         private readonly PresenceInput input = new PresenceInput();
         private PresenceWorld world;
@@ -85,7 +86,7 @@ namespace VRPortalToolkit.Presence
             overlay = gameObject.AddComponent<PresenceOverlay>();
             overlay.Attach(entrance, composite);
             overlay.WallMask = 1 << PresenceWorld.WallLayer;
-            world = new PresenceWorld(surface);
+            world = new PresenceWorld(surface, labelMaterial);
             world.Eye = view;
             world.Entrance = entrance.portal;
             CreateFrameAndPointer();
@@ -526,13 +527,15 @@ namespace VRPortalToolkit.Presence
         {
             FitAperture(false);
             HidePointer();
+            destination = layout.Centre(layout.Goal);
+            UpdateExitPose();
             int[] order = {1, 2, 3, 4, 5, 6, 7, 8};
             PresenceProtocol.Shuffle(order, new Random(trial.Seed ^ 731));
             Matrix4x4 map = entrance.portal.teleportMatrix;
             for (int i = 0; i < 4; ++i)
             {
                 Vector3 behindAperture = entrance.transform.TransformPoint(
-                    new Vector3(i % 2 == 0 ? -0.24f : 0.24f, i < 2 ? 0.20f : -0.23f, -0.16f));
+                    new Vector3(i % 2 == 0 ? -0.24f : 0.24f, i < 2 ? 0.20f : -0.23f, -0.060f));
                 orbs.Add(world.Orb(order[i], map.MultiplyPoint3x4(behindAperture), false));
             }
             stage = Stage.Sorting;

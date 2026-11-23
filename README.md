@@ -49,4 +49,6 @@ A keyboard-and-mouse example uses the toolkit's BasicPortalPair, URP portal rend
 
 ## Simultaneous Presence study
 
-The Simultaneous Presence scene reproduces the paper's portal overlays, navigation and orb-sorting protocol. It includes two scenarios, four study conditions and a separate stencil comparison. See the [study guide](README_PRESENCE.md) for controls, build instructions and data export.
+The Simultaneous Presence scene reproduces the paper's portal overlays, navigation and orb-sorting protocol. It includes two scenarios, four study conditions and a separate stencil comparison. The Linux player was validated on an RTX 4090 with Vulkan. See the [study guide](README_PRESENCE.md) for controls, builds and data export.
+
+![Simultaneous Presence overlay comparison](docs/presence/overlay-comparison.png)

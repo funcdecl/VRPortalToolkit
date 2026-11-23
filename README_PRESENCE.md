@@ -53,6 +53,16 @@ python3 scripts/summarize-presence.py /path/to/studies/P01-* --out Artifacts/Pre
 
 分析输出各技术、场景和指标的样本数、均值、标准差及和。问卷四项临场感得分齐全时，额外导出 `sp-continuum.csv`。正式分析按输入方式分组。自动验收数据有独立标记，只有指定 `--automated` 才能汇总。
 
+## 4090 验收
+
+在 Ubuntu 22.04 的 RTX 4090 上使用 Vulkan 运行 Linux Player。程序完成 8 次练习、24 次正式试次、128 次取球与正确归类、64 次反应任务，检查到 64 次反应期间的出口锁定。门户的实际宽和高均为 0.30 m。缩放、闲置后收回、松手收回、指针落点和墙体动态裁剪均通过检查。
+
+同视点截图中，透明混合的估计线性颜色权重为 33.52%，模板模式的次世界采样点占 33.32%。这些是渲染检查。自动试次用来验证实验程序，真人研究的主观分数来自问卷。
+
+![模式比较与迷宫分拣](docs/presence/overlay-comparison.png)
+
+[试次验收](docs/presence/smoke-result.json) · [像素测量](docs/presence/render-measurements.json)
+
 ## Linux 构建与运行
 
 Unity Editor 2020.3.49f1c1、URP 10.10.1，使用和桌面 Demo 相同的工具链。需要已激活的 Unity Editor、支持 Vulkan 的驱动和 X11 显示会话。

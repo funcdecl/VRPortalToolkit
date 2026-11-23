@@ -72,13 +72,12 @@ Shader "VRPortalToolkit/Presence/Overlay"
             return edge.x * delta.y - edge.y * delta.x;
         }
 
-        float2 RevealUV(Varyings input)
+        float Coverage(Varyings input, float2 uv)
         {
-            float2 uv = input.screen.xy / input.screen.w;
             float2 aspect = float2(_ScreenParams.x / _ScreenParams.y, 1);
             float2 center = input.center.z > 0 ? saturate(input.center.xy) : float2(0.5, 0.5);
             float radius = length(max(center, 1 - center) * aspect) * _Reveal;
-            clip(radius - length((uv - center) * aspect));
+            float visible = step(length((uv - center) * aspect), radius);
 
             float e0 = Wedge(uv, input.edge01.xy, input.edge01.zw);
             float e1 = Wedge(uv, input.edge01.zw, input.edge23.xy);
@@ -86,16 +85,30 @@ Shader "VRPortalToolkit/Presence/Overlay"
             float e3 = Wedge(uv, input.edge23.zw, input.edge01.xy);
             bool inside = min(min(e0, e1), min(e2, e3)) >= 0 ||
                           max(max(e0, e1), max(e2, e3)) <= 0;
-            if (input.center.z > 0 && inside)
-                discard;
-
-            return uv;
+            return input.center.z > 0 && inside ? 0.0 : visible;
         }
 
         float3 SecondaryUV(float2 uv)
         {
-            float4 st = lerp(_MainTex_ST, _MainTex_ST_2, unity_StereoEyeIndex);
-            return float3(uv * st.xy + st.zw, unity_StereoEyeIndex);
+            #if defined(UNITY_STEREO_INSTANCING_ENABLED) || defined(UNITY_STEREO_MULTIVIEW_ENABLED)
+                float eye = unity_StereoEyeIndex;
+            #else
+                float eye = 0.0;
+            #endif
+            float4 st = lerp(_MainTex_ST, _MainTex_ST_2, eye);
+            return float3(uv * st.xy + st.zw, eye);
+        }
+
+        float CompareEdge(float3 uv, float3 firstColor, float depth, float3 normal)
+        {
+            float nextDepth;
+            float3 nextNormal;
+            DecodeDepthNormal(UNITY_SAMPLE_TEX2DARRAY(_PortalDepthNormalsTexture, uv), nextDepth, nextNormal);
+            float3 nextColor = UNITY_SAMPLE_TEX2DARRAY(_MainTex, uv).rgb;
+            float depthEdge = step(0.009, abs(depth - nextDepth));
+            float normalEdge = step(0.30, length(normal - nextNormal));
+            float colorEdge = step(0.13, length(nextColor - firstColor));
+            return max(depthEdge, max(normalEdge, colorEdge));
         }
 
         float EdgeStrength(float3 uv, float3 firstColor)
@@ -103,40 +116,35 @@ Shader "VRPortalToolkit/Presence/Overlay"
             float depth;
             float3 normal;
             DecodeDepthNormal(UNITY_SAMPLE_TEX2DARRAY(_PortalDepthNormalsTexture, uv), depth, normal);
-            float edge = 0;
-            float2 px = abs(_MainTex_TexelSize.xy) * 1.35;
-            const float2 offsets[4] = {float2(1,0), float2(0,1), float2(-1,0), float2(0,-1)};
-            [unroll] for (int i = 0; i < 4; ++i)
-            {
-                float3 sampleUV = float3(uv.xy + px * offsets[i], uv.z);
-                float nextDepth;
-                float3 nextNormal;
-                DecodeDepthNormal(UNITY_SAMPLE_TEX2DARRAY(_PortalDepthNormalsTexture, sampleUV), nextDepth, nextNormal);
-                float3 nextColor = UNITY_SAMPLE_TEX2DARRAY(_MainTex, sampleUV).rgb;
-                edge = max(edge, step(0.009, abs(depth - nextDepth)));
-                edge = max(edge, step(0.30, length(normal - nextNormal)));
-                edge = max(edge, step(0.13, length(nextColor - firstColor)));
-            }
-            return edge;
+            float2 pixel = abs(_MainTex_TexelSize.xy) * 1.35;
+            float3 dx = float3(pixel.x, 0, 0);
+            float3 dy = float3(0, pixel.y, 0);
+            return max(max(CompareEdge(uv + dx, firstColor, depth, normal),
+                           CompareEdge(uv - dx, firstColor, depth, normal)),
+                       max(CompareEdge(uv + dy, firstColor, depth, normal),
+                           CompareEdge(uv - dy, firstColor, depth, normal)));
         }
 
         fixed4 composite(Varyings input) : SV_Target
         {
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-            float3 uv = SecondaryUV(RevealUV(input));
+            float2 screenUV = input.screen.xy / input.screen.w;
+            float coverage = Coverage(input, screenUV);
+            float3 uv = SecondaryUV(screenUV);
             float3 color = UNITY_SAMPLE_TEX2DARRAY(_MainTex, uv).rgb;
             if (_Technique < 1.5)
-                return fixed4(1, 1, 1, 0.5 * EdgeStrength(uv, color));
-            return fixed4(color, _Technique < 2.5 ? 1.0 / 3.0 : 1.0);
+                return fixed4(1, 1, 1, coverage * 0.5 * EdgeStrength(uv, color));
+            return fixed4(color, coverage * (_Technique < 2.5 ? 1.0 / 3.0 : 1.0));
         }
 
         fixed4 markStencil(Varyings input) : SV_Target
         {
             UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-            RevealUV(input);
+            float2 screenUV = input.screen.xy / input.screen.w;
             float2 pixel = floor(input.position.xy);
-            clip(0.5 - fmod(pixel.x + 2 * pixel.y, 3));
-            return 0;
+            float selection = 1.0 - step(0.5, fmod(pixel.x + 2.0 * pixel.y, 3.0));
+            clip(Coverage(input, screenUV) * selection - 0.5);
+            return fixed4(0, 0, 0, 1);
         }
 
         fixed4 fromStencil(Varyings input) : SV_Target

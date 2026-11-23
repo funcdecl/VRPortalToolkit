@@ -15,6 +15,8 @@ namespace VRPortalToolkit.Presence
             public string graphicsDevice;
             public string graphicsApi;
             public int screenshotCount;
+            public float apertureWidthMetres;
+            public float apertureHeightMetres;
             public int trainingTrials;
             public int recordedTrials;
             public int questionnaireStops;
@@ -47,6 +49,9 @@ namespace VRPortalToolkit.Presence
 
             StartComparison();
             yield return null;
+            Vector3 size = Vector3.Scale(entrance.filter.sharedMesh.bounds.size, entrance.transform.lossyScale);
+            report.apertureWidthMetres = Mathf.Abs(size.x);
+            report.apertureHeightMetres = Mathf.Abs(size.y);
             overlay.Technique = OverlayTechnique.Blended;
             overlay.ResetState();
             Vector3 pose = exit.transform.position;
@@ -114,7 +119,22 @@ namespace VRPortalToolkit.Presence
                 yield return null;
                 try
                 {
-                    PresenceResult finished = CheckTrial(ref time, report);
+                    CheckNavigation(ref time, report);
+                }
+                catch (Exception error)
+                {
+                    report.failures.Add("Trial " + (i + 1) + ": " + error.Message);
+                    break;
+                }
+                if (i == 0)
+                {
+                    overlay.ResetState();
+                    yield return Capture(directory, "maze-sorting.png");
+                    ++report.screenshotCount;
+                }
+                try
+                {
+                    PresenceResult finished = CheckSorting(ref time);
                     if (finished.block == 0) ++report.trainingTrials;
                     else ++report.recordedTrials;
                     report.successfulOrbTransfers += finished.sorted;
@@ -137,7 +157,9 @@ namespace VRPortalToolkit.Presence
                 report.questionnaireStops == 4 && report.successfulOrbTransfers == 128 &&
                 report.successfulReactions == 64 && report.placementLockChecks == 64 &&
                 report.movementTrigger && report.inactivityRetraction && report.releaseRetraction &&
-                report.wallClipping && report.nearPlaneFallback && report.pointerLanding && stage == Stage.Complete;
+                report.wallClipping && report.nearPlaneFallback && report.pointerLanding && stage == Stage.Complete &&
+                Mathf.Abs(report.apertureWidthMetres - 0.30f) < 0.001f &&
+                Mathf.Abs(report.apertureHeightMetres - 0.30f) < 0.001f;
             File.WriteAllText(Path.Combine(directory, "smoke-result.json"), JsonUtility.ToJson(report, true));
             Debug.Log("PRESENCE_SMOKE " + (report.passed ? "PASS" : "FAIL"));
             Application.Quit(report.passed ? 0 : 1);
@@ -152,7 +174,7 @@ namespace VRPortalToolkit.Presence
             Destroy(image);
         }
 
-        private PresenceResult CheckTrial(ref double time, SmokeReport report)
+        private void CheckNavigation(ref double time, SmokeReport report)
         {
             BeginTrial(time);
             PresenceResult current = result;
@@ -160,13 +182,16 @@ namespace VRPortalToolkit.Presence
             if (!report.pointerLanding && layout.Route != null)
             {
                 FitAperture(true);
-                UpdatePointer(new Ray(view.transform.position, view.transform.forward));
-                if (validTarget)
+                // An early bend can require a shorter arc than the default view.
+                for (float pitch = 13f; pitch <= 39f && !report.pointerLanding; pitch += 4f)
                 {
-                    report.pointerLanding = TryMoveExit(target, time + 0.05);
-                    Require(report.pointerLanding, "The confirmed pointer destination was rejected.");
+                    Vector3 direction = Quaternion.Euler(pitch, 0f, 0f) * Vector3.forward;
+                    UpdatePointer(new Ray(view.transform.position, direction));
+                    if (validTarget)
+                        report.pointerLanding = TryMoveExit(target, time + 0.05);
                 }
                 FitAperture(false);
+                HidePointer();
             }
 
             if (layout.Route != null)
@@ -187,6 +212,11 @@ namespace VRPortalToolkit.Presence
                 if (stage == Stage.Reaction) CheckReaction(ref time, report);
             }
             Require(stage == Stage.Sorting && current.reactions == 2, "Navigation did not lead to sorting after two reactions.");
+        }
+
+        private PresenceResult CheckSorting(ref double time)
+        {
+            PresenceResult current = result;
             Select(new Ray(view.transform.position, Vector3.back), time + 0.03);
             Require(!heldOrb, "Outside-aperture ray picked a secondary orb.");
             Matrix4x4 map = entrance.portal.teleportMatrix.inverse;

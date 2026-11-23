@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/VRPortalToolkit/PresenceStudy/SimultaneousPresence.unity
+    guid: d5ba681872f5987dbb0684a9a3017cee
+  - enabled: 1
     path: Assets/VRPortalToolkit/DesktopDemo/DesktopDemo.unity
     guid: 8ee384cf475133ca4af8a7b5f88db011
   - enabled: 1
