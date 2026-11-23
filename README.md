@@ -46,3 +46,7 @@ This toolkit was developed in conjunction with the following research papers:
 A keyboard-and-mouse example uses the toolkit's BasicPortalPair, URP portal rendering and Portable physics components. See [Desktop Demo](README_DEMO.md) for Linux build commands, controls and runtime verification.
 
 ![Desktop portal demo](docs/demo/portal-before.png)
+
+## Simultaneous Presence study
+
+The Simultaneous Presence scene reproduces the paper's portal overlays, navigation and orb-sorting protocol. It includes two scenarios, four study conditions and a separate stencil comparison. See the [study guide](README_PRESENCE.md) for controls, build instructions and data export.
